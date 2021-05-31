@@ -23,6 +23,6 @@ type Score struct {
 
 func NewScore() *Score {
 	return &Score{
-		Point: 1.98,
+		Point: 0,
 	}
 }
