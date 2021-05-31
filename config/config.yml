@@ -1,4 +1,4 @@
 environment: dev
 mongo:
   server: mongodb://localhost:27017
-  database: RhythmJudge
+  database: judges321
