@@ -1,4 +1,4 @@
 environment: dev
 mongo:
-  server: mongodb://localhost:27017
+  server: mongodb://127.0.0.1:27017
   database: judges321
