@@ -24,5 +24,6 @@ func main() {
 
 	router := gin.Default()
 	router.POST("/api/event", controller.CreateEvent)
+	router.POST("/api/score", controller.AddScore)
 	router.Run("localhost:8080")
 }
