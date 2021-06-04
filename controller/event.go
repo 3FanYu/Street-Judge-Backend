@@ -8,6 +8,7 @@ import (
 	"github.com/3FanYu/Judges321-backend/database"
 	"github.com/3FanYu/Judges321-backend/model"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func CreateEvent(c *gin.Context) {
@@ -28,6 +29,7 @@ func CreateEvent(c *gin.Context) {
 		res = nil
 	}
 	c.JSON(200, gin.H{
-		"message": res,
+		"message": true,
+		"eventID":res.InsertedID.(primitive.ObjectID).Hex(),
 	})
 }

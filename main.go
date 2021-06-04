@@ -7,6 +7,7 @@ import (
 	"github.com/3FanYu/Judges321-backend/config"
 	"github.com/3FanYu/Judges321-backend/controller"
 	"github.com/3FanYu/Judges321-backend/database"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,6 +24,7 @@ func main() {
 	}()
 
 	router := gin.Default()
+	router.Use(cors.Default())
 	router.POST("/api/event", controller.CreateEvent)
 	router.POST("/api/score", controller.AddScore)
 	router.Run("localhost:8080")
