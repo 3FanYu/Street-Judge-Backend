@@ -27,5 +27,7 @@ func main() {
 	router.Use(cors.Default())
 	router.POST("/api/event", controller.CreateEvent)
 	router.POST("/api/score", controller.AddScore)
+	router.POST("/api/judge", controller.CreateJudge)
+
 	router.Run("localhost:8080")
 }

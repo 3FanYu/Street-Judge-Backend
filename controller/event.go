@@ -18,9 +18,6 @@ func CreateEvent(c *gin.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// 依據rowNum 決定每個評審底下要儲存幾筆score
-	// 依據judgeName數量決定加幾筆Judge
-	// fmt.Printf("%+v\n", judges)
 	// 開存
 	collection := database.Db.Collection("events")
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
