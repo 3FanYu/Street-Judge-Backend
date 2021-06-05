@@ -7,6 +7,5 @@ type Score struct {
 	JudgeID string             `json:"judgeID,omitempty" bson:"judgeID,omitempty"`
 	Row     int                `json:"row,omitempty" bson:"row,omitempty"`
 	Number  int                `json:"number,omitempty" bson:"number,omitempty"`
-	Name    string             `json:"name,omitempty" bson:"name,omitempty"`
 	Point   float32            `json:"point,omitempty" bson:"point,omitempty"`
 }
