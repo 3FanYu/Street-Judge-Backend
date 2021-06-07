@@ -29,6 +29,7 @@ func main() {
 	router.POST("/api/score", controller.AddScore)
 	router.POST("/api/judge", controller.CreateJudge)
 	router.GET("/api/judge", controller.GetJudge)
+	router.PATCH("/api/score", controller.PatchScore)
 
 	router.Run("localhost:8080")
 }
