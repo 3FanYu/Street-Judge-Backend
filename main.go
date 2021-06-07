@@ -28,6 +28,7 @@ func main() {
 	router.POST("/api/event", controller.CreateEvent)
 	router.POST("/api/score", controller.AddScore)
 	router.POST("/api/judge", controller.CreateJudge)
+	router.GET("/api/judge", controller.GetJudge)
 
 	router.Run("localhost:8080")
 }
