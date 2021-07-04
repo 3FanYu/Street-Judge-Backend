@@ -15,10 +15,15 @@ import (
 
 func AddScore(c *gin.Context) {
 	var newScore model.Score
-	err := c.BindJSON(&newScore)
+	err := c.ShouldBindJSON(&newScore)
 	if err != nil {
-		log.Fatal(err)
+		c.JSON(400, gin.H{
+			"result":  false,
+			"message": err.Error(),
+		})
+		return
 	}
+
 	collection := database.Db.Collection("scores")
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	res, err := collection.InsertOne(ctx, newScore)
@@ -26,7 +31,7 @@ func AddScore(c *gin.Context) {
 		res = nil
 	}
 	c.JSON(200, gin.H{
-		"message":    true,
+		"result":     true,
 		"insertedID": res.InsertedID,
 	})
 }
@@ -50,7 +55,7 @@ func PatchScore(c *gin.Context) {
 		log.Fatal(err)
 	}
 	c.JSON(200, gin.H{
-		"message":    true,
+		"result":     true,
 		"insertedID": res,
 	})
 }
