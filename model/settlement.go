@@ -10,5 +10,5 @@ type JudgeScore struct {
 	EventID string             `json:"eventID,omitempty" bson:"eventID,omitempty"`
 	Name    string             `json:"name,omitempty" bson:"name,omitempty"`
 	RowNum  int                `json:"rowNum,omitempty" bson:"rowNum,omitempty"`
-	Scores  []Score            `json:"scores" bson:"scores,omitempty"`
+	Scores  [][]Score          `json:"scores" bson:"scores,omitempty"`
 }

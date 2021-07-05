@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -13,11 +14,12 @@ import (
 )
 
 func SettleScore(c *gin.Context) {
-	eventID := c.Query("eventID")     // 取得 eventID
-	judges := getAllJudges(&eventID)  // 取得此 eventID 的所有judge
+	eventID := c.Query("eventID")    // 取得 eventID
+	judges := getAllJudges(&eventID) // 取得此 eventID 的所有judge
+	addUps := make([][]model.Score, 0)
 	ch := make(chan model.JudgeScore) // 創建channel
 	for i := 0; i < len(*judges); i++ {
-		go getAllScores(&((*judges)[i]), ch) //同步取得多位judge的所有分數，並使用channel回傳。
+		go getAllScores(&((*judges)[i]), ch, &addUps) //同步取得多位judge的所有分數，並使用channel回傳。
 	}
 	result := make([]interface{}, 0)    // 創造空slice並依序把channel收到的回傳值插入
 	for x := 0; x < len(*judges); x++ { // 有幾位judge就接收channel幾次
@@ -26,6 +28,7 @@ func SettleScore(c *gin.Context) {
 	c.JSON(200, gin.H{ //回傳
 		"message":    true,
 		"settlement": result,
+		"addUps":     addUps,
 	})
 }
 
@@ -47,7 +50,7 @@ func getAllJudges(eventID *string) *[]model.Judge {
 }
 
 // 取得該judge的所有分數
-func getAllScores(judge *model.Judge, ch chan model.JudgeScore) {
+func getAllScores(judge *model.Judge, ch chan model.JudgeScore, addUps *[][]model.Score) {
 	judgeID := judge.ID.Hex()
 	collection := database.Db.Collection("scores")
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
@@ -62,11 +65,14 @@ func getAllScores(judge *model.Judge, ch chan model.JudgeScore) {
 	}
 	// 如果沒有分數就回傳空陣列
 	if len(scores) > 0 {
+		var arrangedScores = make([][]model.Score, 0)
+		reArrangeScores(scores, &arrangedScores, judge.RowNum)
+		addUpScores(addUps, arrangedScores)
 		var judgeScore = model.JudgeScore{
 			ID:     judge.ID,
 			Name:   judge.Name,
 			RowNum: judge.RowNum,
-			Scores: scores,
+			Scores: arrangedScores,
 		}
 		ch <- judgeScore
 	} else {
@@ -74,9 +80,72 @@ func getAllScores(judge *model.Judge, ch chan model.JudgeScore) {
 			ID:     judge.ID,
 			Name:   judge.Name,
 			RowNum: judge.RowNum,
-			Scores: []model.Score{},
+			Scores: [][]model.Score{},
 		}
 		ch <- judgeScore
 	}
+}
 
+// 按照 row、 number 重新排序所有分數，中間有空的分數直接補入空值
+func reArrangeScores(scores []model.Score, arrangedScores *[][]model.Score, rowNum int) {
+	var scoreArray *[][]model.Score = arrangedScores
+	var subArray []model.Score
+	r, n := 1, 1
+
+	for i := 0; i < len(scores); {
+		if scores[i].Number == n && scores[i].Row == r { //該號碼該排有分數就插入
+			subArray = append(subArray, scores[i])
+			fmt.Println("append 1, currentRow: ", r, " currentNum: ", n)
+			r++
+			i++
+		} else { //該號碼該排沒分數就插入nil
+			subArray = append(subArray, model.Score{})
+			fmt.Println("append empty, currentRow: ", r, " currentNum: ", n)
+			r++
+		}
+		if r > rowNum {
+			r = 1
+			n++
+			*scoreArray = append(*scoreArray, subArray)
+			subArray = nil
+		}
+		//最後一筆資料如果沒有填滿所有rowNum 就把其餘的補上null
+		if i == len(scores) {
+			fmt.Println("last")
+			if r != 1 && r <= rowNum {
+				for r <= rowNum {
+					subArray = append(subArray, model.Score{})
+					r++
+				}
+				*scoreArray = append(*scoreArray, subArray)
+			}
+		}
+	}
+}
+
+func addUpScores(addUps *[][]model.Score, allScores [][]model.Score) {
+	if len(*addUps) > 0 {
+		for i, scores := range allScores {
+			if len(*addUps) > i {
+				for j, score := range scores {
+					(*addUps)[i][j].Point += score.Point
+				}
+			} else {
+				fmt.Println("is Nil")
+				(*addUps) = append((*addUps), scores)
+			}
+		}
+	} else {
+		for _, scores := range allScores {
+			tmpScores := make([]model.Score, 0)
+			for _, score := range scores {
+				tmpScores = append(tmpScores, model.Score{
+					Row:    score.Row,
+					Number: score.Number,
+					Point:  score.Point,
+				})
+			}
+			*addUps = append(*addUps, tmpScores)
+		}
+	}
 }
