@@ -124,12 +124,19 @@ func arrangeScores(scores []model.Score, arrangedScores *[][]model.Score, rowNum
 
 	for i := 0; i < len(scores); {
 		if scores[i].Number == n && scores[i].Row == r { //該號碼該排有分數就插入
-			subArray = append(subArray, scores[i])
+			currentScore := model.Score{
+				ID:      scores[i].ID,
+				Row:     scores[i].Row,
+				Number:  scores[i].Number,
+				Point:   scores[i].Point,
+				IsEmpty: false,
+			}
+			subArray = append(subArray, currentScore)
 			fmt.Println("append 1, currentRow: ", r, " currentNum: ", n)
 			r++
 			i++
 		} else { //該號碼該排沒分數就插入nil
-			subArray = append(subArray, model.Score{})
+			subArray = append(subArray, model.Score{IsEmpty: true})
 			fmt.Println("append empty, currentRow: ", r, " currentNum: ", n)
 			r++
 		}
@@ -144,7 +151,7 @@ func arrangeScores(scores []model.Score, arrangedScores *[][]model.Score, rowNum
 			fmt.Println("last")
 			if r != 1 && r <= rowNum {
 				for r <= rowNum {
-					subArray = append(subArray, model.Score{})
+					subArray = append(subArray, model.Score{IsEmpty: true})
 					r++
 				}
 				*scoreArray = append(*scoreArray, subArray)

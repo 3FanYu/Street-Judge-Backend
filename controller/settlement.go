@@ -26,9 +26,9 @@ func SettleScore(c *gin.Context) {
 		result = append(result, <-ch)
 	}
 	c.JSON(200, gin.H{ //回傳
-		"message":    true,
-		"settlement": result,
-		"addUps":     addUps,
+		"message":   true,
+		"allScores": result,
+		"addUps":    addUps,
 	})
 }
 
@@ -94,12 +94,19 @@ func reArrangeScores(scores []model.Score, arrangedScores *[][]model.Score, rowN
 
 	for i := 0; i < len(scores); {
 		if scores[i].Number == n && scores[i].Row == r { //該號碼該排有分數就插入
-			subArray = append(subArray, scores[i])
+			currentScore := model.Score{
+				ID:      scores[i].ID,
+				Row:     scores[i].Row,
+				Number:  scores[i].Number,
+				Point:   scores[i].Point,
+				IsEmpty: false,
+			}
+			subArray = append(subArray, currentScore)
 			fmt.Println("append 1, currentRow: ", r, " currentNum: ", n)
 			r++
 			i++
 		} else { //該號碼該排沒分數就插入nil
-			subArray = append(subArray, model.Score{})
+			subArray = append(subArray, model.Score{IsEmpty: true})
 			fmt.Println("append empty, currentRow: ", r, " currentNum: ", n)
 			r++
 		}
@@ -114,7 +121,7 @@ func reArrangeScores(scores []model.Score, arrangedScores *[][]model.Score, rowN
 			fmt.Println("last")
 			if r != 1 && r <= rowNum {
 				for r <= rowNum {
-					subArray = append(subArray, model.Score{})
+					subArray = append(subArray, model.Score{IsEmpty: true})
 					r++
 				}
 				*scoreArray = append(*scoreArray, subArray)
@@ -140,9 +147,10 @@ func addUpScores(addUps *[][]model.Score, allScores [][]model.Score) {
 			tmpScores := make([]model.Score, 0)
 			for _, score := range scores {
 				tmpScores = append(tmpScores, model.Score{
-					Row:    score.Row,
-					Number: score.Number,
-					Point:  score.Point,
+					Row:     score.Row,
+					Number:  score.Number,
+					Point:   score.Point,
+					IsEmpty: false,
 				})
 			}
 			*addUps = append(*addUps, tmpScores)
