@@ -8,4 +8,5 @@ type Score struct {
 	Row     int                `json:"row" bson:"row" binding:"required"`
 	Number  int                `json:"number" bson:"number" binding:"required"`
 	Point   float32            `json:"point" bson:"point" `
+	IsEmpty bool               `json:"isEmpty" bson:"isEmpty,omitempty" `
 }
