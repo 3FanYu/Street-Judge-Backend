@@ -80,7 +80,8 @@ func GetJudge(c *gin.Context) {
 	if err = cursor.All(ctx, &scores); err != nil {
 		log.Fatal(err)
 	}
-	var arrangedScores []interface{}
+	arrangedScores := make([][]model.Score, 0)
+	fmt.Println(arrangedScores)
 	go arrangeScores(scores, &arrangedScores, judge.RowNum)
 	wg.Add(1)
 
@@ -109,9 +110,9 @@ func GetJudge(c *gin.Context) {
 }
 
 // 按照 row、 number 重新排序所有分數，中間有空的分數直接補入空值
-func arrangeScores(scores []model.Score, arrangedScores *[]interface{}, rowNum int) {
-	var scoreArray *[]interface{} = arrangedScores
-	var subArray []interface{}
+func arrangeScores(scores []model.Score, arrangedScores *[][]model.Score, rowNum int) {
+	var scoreArray *[][]model.Score = arrangedScores
+	var subArray []model.Score
 	r, n := 1, 1
 
 	// for i:=0;i<greatestNumber;i++{
@@ -128,7 +129,7 @@ func arrangeScores(scores []model.Score, arrangedScores *[]interface{}, rowNum i
 			r++
 			i++
 		} else { //該號碼該排沒分數就插入nil
-			subArray = append(subArray, nil)
+			subArray = append(subArray, model.Score{})
 			fmt.Println("append empty, currentRow: ", r, " currentNum: ", n)
 			r++
 		}
@@ -143,7 +144,7 @@ func arrangeScores(scores []model.Score, arrangedScores *[]interface{}, rowNum i
 			fmt.Println("last")
 			if r != 1 && r <= rowNum {
 				for r <= rowNum {
-					subArray = append(subArray, nil)
+					subArray = append(subArray, model.Score{})
 					r++
 				}
 				*scoreArray = append(*scoreArray, subArray)
