@@ -232,6 +232,7 @@ func addUpScores(ch chan *[]model.Score, ch_response chan *[]model.Score, rowNum
 					// fmt.Println("addups ", (addUps)[i].Number, (addUps)[i].Row)
 
 					(addUps)[i].Point += score.Point
+					(addUps)[i].Point = (addUps)[i].Point*100/100
 					(addUps)[i].IsEmpty = (addUps)[i].IsEmpty || score.IsEmpty // 判定是否為empty
 				}
 			}
