@@ -26,6 +26,7 @@ func main() {
 	router := gin.Default()
 	router.Use(cors.Default())
 	router.POST("/api/event", controller.CreateEvent)
+	router.GET("/api/event", controller.GetEvent)
 	router.POST("/api/score", controller.AddScore)
 	router.POST("/api/judge", controller.CreateJudge)
 	router.GET("/api/judge", controller.GetJudge)
