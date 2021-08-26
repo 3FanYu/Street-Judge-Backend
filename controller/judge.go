@@ -24,20 +24,10 @@ func CreateJudge(c *gin.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	//資料放進[]interfce{}
-	var tmp []interface{}
-	for _, v := range judges.Names {
-		var judge = model.Judge{
-			EventID: judges.EventID,
-			Name:    v,
-			RowNum:  judges.RowNum,
-		}
-		tmp = append(tmp, judge)
-	}
+
 	// 開存
-	collection := database.Db.Collection("judges")
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	res, err := collection.InsertMany(ctx, tmp)
+	res, err := judges.CreateJudge()
+
 	if err != nil {
 		res = nil
 	}
