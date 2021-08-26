@@ -24,7 +24,7 @@ func main() {
 	}()
 
 	router := gin.Default()
-	router.Use(cors.Default())
+	router.Use(cors.New(config.CorsConfig()))
 	router.POST("/api/event", controller.CreateEvent)
 	router.GET("/api/event", controller.GetEvent)
 	router.POST("/api/score", controller.AddScore)
