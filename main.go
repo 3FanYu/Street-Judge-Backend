@@ -25,6 +25,11 @@ func main() {
 
 	router := gin.Default()
 	router.Use(cors.New(config.CorsConfig()))
+	router.GET("/api", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "pong",
+		})
+	})
 	router.POST("/api/event", controller.CreateEvent)
 	router.GET("/api/event", controller.GetEvent)
 	router.POST("/api/score", controller.AddScore)
