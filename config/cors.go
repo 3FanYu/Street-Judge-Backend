@@ -8,8 +8,9 @@ import (
 func CorsConfig() cors.Config {
 	config := cors.Config{
 		AllowOrigins:     []string{"https://www.street-judge.club"},
-		AllowMethods:     []string{"PUT", "PATCH"},
-		AllowHeaders:     []string{"Origin"},
+		AllowMethods:     []string{"GET", "POST", "DELETE", "OPTIONS", "PUT"},
+		AllowHeaders:     []string{"Authorization", "Content-Type", "Upgrade", "Origin",
+		"Connection", "Accept-Encoding", "Accept-Language", "Host"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		AllowOriginFunc: func(origin string) bool {
