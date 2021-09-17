@@ -22,7 +22,7 @@ func SettleScore(c *gin.Context) {
 	ch := make(chan model.JudgeScore)             // 創建channel
 	ch_addUps := make(chan *[]model.Score)        // addUps channel
 	ch_addUpResponse := make(chan *[]model.Score) // addUps channel
-	go addUpScores(ch_addUps, ch_addUpResponse, (*judges)[0].RowNum)
+	go addUpScores(ch_addUps, ch_addUpResponse, (*judges)[0].RowNum, len(*judges))
 	for i := 0; i < len(*judges); i++ {
 		go getAllScores(&((*judges)[i]), ch, ch_addUps) //同步取得多位judge的所有分數，並使用channel回傳。
 	}
@@ -73,6 +73,7 @@ func getAllScores(judge *model.Judge, ch_score chan model.JudgeScore, ch_addUps 
 	if err = cursor.All(ctx, &scores); err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println(judgeID)
 	rankScores(&scores)
 	sortByRowandNum(&scores)
 	// addUpScores(addUps, &scores, judge.RowNum)
@@ -192,14 +193,17 @@ func sortByPoint(scores *[]model.Score) {
 	})
 }
 
-func addUpScores(ch chan *[]model.Score, ch_response chan *[]model.Score, rowNum int) {
+func addUpScores(ch chan *[]model.Score, ch_response chan *[]model.Score, rowNum int, judgeNum int) {
 	addUps := make([]model.Score, 0)
 	allScores := make([][]model.Score, 0)
-	for i := 0; i < rowNum; { // 等待接收所有judges 的scores
+	for i := 0; i < judgeNum; { // 等待接收所有judges 的scores
 		// 分數進來後先插入必要的空白分數
+
 		scores := <-ch
+
 		r, n := 1, 1
 		arrangedScores := make([]model.Score, 0) // 加入空白分數後的分數
+
 		for i := 0; i < len(*scores); {
 			if r > rowNum {
 				r = 1
@@ -232,7 +236,7 @@ func addUpScores(ch chan *[]model.Score, ch_response chan *[]model.Score, rowNum
 					// fmt.Println("addups ", (addUps)[i].Number, (addUps)[i].Row)
 
 					(addUps)[i].Point += score.Point
-					(addUps)[i].Point = (addUps)[i].Point*100/100
+					(addUps)[i].Point = (addUps)[i].Point * 100 / 100
 					(addUps)[i].IsEmpty = (addUps)[i].IsEmpty || score.IsEmpty // 判定是否為empty
 				}
 			}
@@ -244,5 +248,4 @@ func addUpScores(ch chan *[]model.Score, ch_response chan *[]model.Score, rowNum
 		}
 	}
 	ch_response <- &addUps
-	fmt.Println("done")
 }
