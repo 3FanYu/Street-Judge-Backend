@@ -2,6 +2,9 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"log"
+	"os"
 	"time"
 
 	"github.com/3FanYu/Judges321-backend/config"
@@ -9,9 +12,15 @@ import (
 	"github.com/3FanYu/Judges321-backend/database"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// load .env
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	// set up database
 	conf := config.GetConfig()
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -23,6 +32,7 @@ func main() {
 		}
 	}()
 
+	port := os.Getenv("PORT")
 	router := gin.Default()
 	router.Use(cors.New(config.CorsConfig()))
 	router.GET("/api", func(c *gin.Context) {
@@ -37,5 +47,5 @@ func main() {
 	router.GET("/api/judge", controller.GetJudge)
 	router.GET("/api/settlement", controller.SettleScore)
 
-	router.Run("localhost:8080")
+	router.Run("localhost:" + port)
 }
