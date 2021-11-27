@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -34,7 +33,8 @@ func main() {
 
 	port := os.Getenv("PORT")
 	router := gin.Default()
-	router.Use(cors.New(config.CorsConfig()))
+	// router.Use(cors.New(config.CorsConfig()))
+	router.Use(cors.Default())
 	router.GET("/api", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
